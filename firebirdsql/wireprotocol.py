@@ -357,14 +357,16 @@ class WireProtocol(object):
             elif t == datetime.time:
                 v = convert_time(p)
                 if p.tzinfo:
-                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 2)
+                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 4)
+                    print(v)
                     blr += bs([28])
                 else:
                     blr += bs([13])
             elif t == datetime.datetime:
                 v = convert_timestamp(p)
                 if p.tzinfo:
-                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 2)
+                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 4)
+                    print(v)
                     blr += bs([29])
                 else:
                     blr += bs([35])

@@ -12,7 +12,8 @@ from firebirdsql.consts import *
 
 class TestTimeZone(TestBase):
     def setUp(self):
-        self.database=tempfile.mktemp()
+#        self.database=tempfile.mktemp()
+        self.database='/tmp/tztest.fdb'
         self.connection = firebirdsql.create_database(
                 auth_plugin_name=self.auth_plugin_name,
                 wire_crypt=self.wire_crypt,
@@ -43,7 +44,7 @@ class TestTimeZone(TestBase):
         cur = self.connection.cursor()
         cur.execute("insert into tz_test (id) values (1)")
 
-        tzinfo = pytz.timezone('Asia/Tokyo')
+        tzinfo = pytz.timezone('Asia/Seoul')
         cur.execute(
             "insert into tz_test (id, t, ts) values (2, ?, ?)", [
                 datetime.time(12, 34, 56, tzinfo=tzinfo),
@@ -56,6 +57,6 @@ class TestTimeZone(TestBase):
         for a, b, c in cur.fetchall():
             print(a, b, c)
             pass
-
+        self.connection.commit()
         self.connection.close()
 
