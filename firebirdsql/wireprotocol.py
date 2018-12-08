@@ -45,6 +45,7 @@ from firebirdsql import DisconnectByPeer, InternalError, OperationalError, Integ
 from firebirdsql.consts import *
 from firebirdsql.utils import *
 from firebirdsql import srp
+from firebirdsql import tz_utils
 try:
     from Crypto.Cipher import ARC4
 except ImportError:
@@ -355,10 +356,18 @@ class WireProtocol(object):
                 blr += bs([12])
             elif t == datetime.time:
                 v = convert_time(p)
-                blr += bs([13])
+                if p.tzinfo:
+                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 2)
+                    blr += bs([28])
+                else:
+                    blr += bs([13])
             elif t == datetime.datetime:
                 v = convert_timestamp(p)
-                blr += bs([35])
+                if p.tzinfo:
+                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 2)
+                    blr += bs([29])
+                else:
+                    blr += bs([35])
             elif t == bool:
                 v = bs([1, 0, 0, 0]) if p else bs([0, 0, 0, 0])
                 blr += bs([23])
