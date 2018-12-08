@@ -31,28 +31,28 @@ class TestTimeZone(TestBase):
         cur = self.connection.cursor()
         cur.execute('''
             CREATE TABLE tz_test (
-                a INTEGER NOT NULL,
-                b TIME WITH TIME ZONE DEFAULT '12:34:56',
-                c TIMESTAMP WITH TIME ZONE DEFAULT '1967-08-11 23:45:01',
-                PRIMARY KEY (a)
+                id INTEGER NOT NULL,
+                t TIME WITH TIME ZONE DEFAULT '12:34:56',
+                ts TIMESTAMP WITH TIME ZONE DEFAULT '1967-08-11 23:45:01',
+                PRIMARY KEY (id)
             )
         ''')
         cur.close()
         self.connection.commit()
 
         cur = self.connection.cursor()
-        cur.execute("insert into tz_test (a) values (1)")
+        cur.execute("insert into tz_test (id) values (1)")
 
         tzinfo = pytz.timezone('Asia/Tokyo')
         cur.execute(
-            "insert into tz_test (a, b, c) values (1, ?, ?)", [
+            "insert into tz_test (id, t, ts) values (2, ?, ?)", [
                 datetime.time(12, 34, 56, tzinfo=tzinfo),
                 datetime.datetime(1967, 8, 11, 23, 45, 1, tzinfo=tzinfo)
             ]
         )
 
         cur = self.connection.cursor()
-        cur.execute("select * from tz_test")
+        cur.execute("select * from tz_test order by id")
         for a, b, c in cur.fetchall():
             print(a, b, c)
             pass
