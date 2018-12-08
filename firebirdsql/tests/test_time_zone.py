@@ -3,7 +3,8 @@ import sys
 import unittest
 import tempfile
 import datetime
-from decimal import Decimal
+import pytz
+
 import firebirdsql
 from firebirdsql.tests.base import *
 from firebirdsql.consts import *
@@ -23,7 +24,6 @@ class TestTimeZone(TestBase):
                 page_size=self.page_size,
                 tz_name='Asia/Tokyo')
 
-    @unittest.skip("FB 4")
     def test_time_zone(self):
         """
         For FB4
@@ -43,9 +43,18 @@ class TestTimeZone(TestBase):
         cur = self.connection.cursor()
         cur.execute("insert into tz_test (a) values (1)")
 
+        tzinfo = pytz.timezone('Asia/Tokyo')
+        cur.execute(
+            "insert into tz_test (a, b, c) values (1, ?, ?)", [
+                datetime.time(12, 34, 56, tzinfo=tzinfo),
+                datetime.datetime(1967, 8, 11, 23, 45, 1, tzinfo=tzinfo)
+            ]
+        )
+
         cur = self.connection.cursor()
         cur.execute("select * from tz_test")
         for a, b, c in cur.fetchall():
+            print(a, b, c)
             pass
 
         self.connection.close()
