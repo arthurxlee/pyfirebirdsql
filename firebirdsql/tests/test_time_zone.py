@@ -54,7 +54,6 @@ class TestTimeZone(TestBase):
         cur = self.connection.cursor()
         cur.execute("select * from tz_test order by id")
         r1, r2 = cur.fetchall()
-        print(r1)
-        print(r2)
+        self.assertEqual(r1, r2)
         self.connection.close()
 
