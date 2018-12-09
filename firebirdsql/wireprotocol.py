@@ -104,7 +104,8 @@ def convert_timestamp(v):   # Convert datetime.datetime to BLR format timestamp
 
 def convert_time_tz(v):  # Convert datetime.time to BLR format time_tz
     import pytz
-    v2 = v  # TODO: convert
+    # TODO: fix timezone
+    v2 = datetime.time(v.hour, v.minute, v.second, v.microsecond, tzinfo=pytz.utc)
     t = (v2.hour*3600 + v2.minute*60 + v2.second) * 10000 + v2.microsecond // 100
     r = bint_to_bytes(t, 4)
     r += bint_to_bytes(tz_utils.get_timezone_id(v.tzinfo.zone), 4)
@@ -113,7 +114,8 @@ def convert_time_tz(v):  # Convert datetime.time to BLR format time_tz
 
 def convert_timestamp_tz(v):   # Convert datetime.datetime to BLR format timestamp_tz
     import pytz
-    v2 = v  # TODO: convert
+    # TODO: fix timezone
+    v2 = datetime.datetime(v.year, v.month, v.day, v.hour, v.minute, v.second, v.microsecond, tzinfo=pytz.utc)
     r = convert_date(v2.date()) + convert_time(v2.time())
     r += bint_to_bytes(tz_utils.get_timezone_id(v.tzinfo.zone), 4)
     return r
