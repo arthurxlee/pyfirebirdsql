@@ -102,6 +102,23 @@ def convert_timestamp(v):   # Convert datetime.datetime to BLR format timestamp
     return convert_date(v.date()) + convert_time(v.time())
 
 
+def convert_time_tz(v):  # Convert datetime.time to BLR format time_tz
+    import pytz
+    v2 = v  # TODO: convert
+    t = (v2.hour*3600 + v2.minute*60 + v2.second) * 10000 + v2.microsecond // 100
+    r = bint_to_bytes(t, 4)
+    r += bint_to_bytes(tz_utils.get_timezone_id(v.tzinfo.zone), 4)
+    return r
+
+
+def convert_timestamp_tz(v):   # Convert datetime.datetime to BLR format timestamp_tz
+    import pytz
+    v2 = v  # TODO: convert
+    r = convert_date(v2.date()) + convert_time(v2.time())
+    r += bint_to_bytes(tz_utils.get_timezone_id(v.tzinfo.zone), 4)
+    return r
+
+
 def wire_operation(fn):
     if not DEBUG:
         return fn
@@ -355,20 +372,18 @@ class WireProtocol(object):
                 v = convert_date(p)
                 blr += bs([12])
             elif t == datetime.time:
-                v = convert_time(p)
                 if p.tzinfo:
-                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 4)
-                    print(v)
+                    v = convert_time_tz(p)
                     blr += bs([28])
                 else:
+                    v = convert_time(p)
                     blr += bs([13])
             elif t == datetime.datetime:
-                v = convert_timestamp(p)
                 if p.tzinfo:
-                    v += bint_to_bytes(tz_utils.get_timezone_id(p.tzinfo.zone), 4)
-                    print(v)
+                    v = convert_timestamp_tz(p)
                     blr += bs([29])
                 else:
+                    v = convert_timestamp(p)
                     blr += bs([35])
             elif t == bool:
                 v = bs([1, 0, 0, 0]) if p else bs([0, 0, 0, 0])

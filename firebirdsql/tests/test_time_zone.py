@@ -12,8 +12,7 @@ from firebirdsql.consts import *
 
 class TestTimeZone(TestBase):
     def setUp(self):
-#        self.database=tempfile.mktemp()
-        self.database='/tmp/tztest.fdb'
+        self.database=tempfile.mktemp()
         self.connection = firebirdsql.create_database(
                 auth_plugin_name=self.auth_plugin_name,
                 wire_crypt=self.wire_crypt,
@@ -54,9 +53,8 @@ class TestTimeZone(TestBase):
 
         cur = self.connection.cursor()
         cur.execute("select * from tz_test order by id")
-        for a, b, c in cur.fetchall():
-            print(a, b, c)
-            pass
-        self.connection.commit()
+        r1, r2 = cur.fetchall()
+        print(r1)
+        print(r2)
         self.connection.close()
 
